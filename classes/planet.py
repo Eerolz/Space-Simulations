@@ -1,12 +1,13 @@
 from scipy import constants as con
 import math
+import atmosphere
 
 class Planet:
     """Planet class for space simulations"""
     def __init__(mass, radius):
         self.mass = mass
         self.radius = radius
-        self.atmosphere = Atmosphere()
+        self.atmosphere = Atmosphere(1.225, 8400) #numbers for earth
 
         def get_g(altitude):
             g = (con.G*self.mass)/(self.radius+altitude)**2
@@ -18,24 +19,3 @@ class Planet:
 
         def get_air(altitude):
             return self.atmosphere.get_air(altitude)
-
-
-
-class Atmosphere:
-    """Atmosphere for Planet class."""
-    def __init__(P_0, H):
-        self.P_0 = P_0 #kg/m^3 // density at sea level
-        self.H = H #m, scale height
-
-    def get_P(altitude):
-        """Density (kg/m^3) at altitude (m)"""
-        P = self.P_0 * math.e**(-altitude/self.H)
-        return P
-
-    def get_Re():
-        return False # TODO: calculate Reynolds number
-
-    def get_air(altitude):
-        P = self.get_P(altitude)
-        Re = self.get_Re()
-        return {'P':P, 'Re':Re}
