@@ -42,7 +42,7 @@ class AtmosphereModel():
         rho = self.rho_0 * math.e**(-alt/H)    # Density (kg/m^3)
 
         return rho
-    
+
     def get_P(self, alt):
         H = self.get_H(alt)
         P = self.P_0 * math.e**(-alt/H)    # Ambient pressure (Pa)
@@ -61,41 +61,21 @@ class AtmosphereModel():
 
         return mu
 
-    def get_nu(self, alt):
-        mu = self.get_mu(alt)
-        rho = self.get_rho(alt)
-        nu = mu / rho
-
-        return nu
-
     def get_Re(self, alt, v, l):
         mu = self.get_mu(alt)
         rho = self.get_rho(alt)
         Re = (rho * v * l) / mu    # Reynolds number
 
         return Re
-    
+
     def get_Be(self, alt, v, l):
         Q = self.get_Q(alt, v)
         P = self.get_P(alt)
         mu = self.get_mu(alt)
         rho = self.get_rho(alt)
-        
+
         dP = (Q + P) - P    # Pressure difference across l
-        alpha = mu / rho    # Momentum diffusivity (m^2/s)
-        Be = dP * l**2 / (mu * alpha)    # Bejan number
-        
+        nu = mu / rho    # Momentum diffusivity (m^2/s)
+        Be = dP * l**2 / (mu * nu)    # Bejan number
+
         return Be
-    
-    def get_drag(self, alt, v, d, l):
-        Re = self.get_Re(alt, v, l)
-        Be = self.get_Be(alt, v, l)
-        
-        A_cross = con.pi * (d / 2)**2    # assuming circular cross-section
-        A_wet = (con.pi * d * l) + A_cross    # assuming cylinder-like shape of length l
-        C_d = (A_wet / A_cross) * (Be / Re**2)    # Drag coefficient 
-        
-        rho = self.get_rho(alt)
-        drag = 0.5 * rho * C_d * A_cross * v**2    # Drag force (N)
-        
-        return drag
