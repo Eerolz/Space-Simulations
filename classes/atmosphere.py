@@ -45,11 +45,18 @@ class AtmosphereModel():
 
         return Q
 
-    def get_mu(alt):
+    def get_mu(self, alt):
         T = self.get_T(alt)
         mu = self.mu_0 * (T/self.T_0)**0.7
 
         return mu
+
+    def get_nu(self, alt):
+        mu = self.get_mu(alt)
+        rho = self.get_rho(alt)
+        nu = mu / rho
+
+        return nu
 
     def get_Re(self, alt, v, l):
         mu = self.get_mu(alt)
