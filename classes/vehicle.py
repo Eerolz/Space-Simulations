@@ -1,13 +1,13 @@
 from scipy import constants as con
 
 class Vehicle:
-    def __init__(self, size, weight, planet = None, shape = "cylinder", alt = 0, V = 0, propulsion = None, fuel = 0, fuel_usage = None):
+    def __init__(self, size, mass, planet = None, shape = "cylinder", alt = 0, V = 0, propulsion = None, fuel = 0, fuel_usage = None):
         # dimensions (m), (lenght, width, depth), if no width, width=length; if no depth, depth=width
         if len(size) == 1:
             self.size = (size[0], size[0], size[0])
         elif len(size) == 2:
             self.size = (size[0], size[1], size[1])
-            self.weight = weight # dry weight (kg)
+        self.mass = mass # dry mass (kg)
         self.planet = planet # the planet Vehicle is on
         self.shape = shape # shape of the Vehicle
         self.propulsion = propulsion # N
@@ -39,5 +39,25 @@ class Vehicle:
 
         return drag
 
+    def propel(time):
+        fuel_time = self.fuel/self.fuel_usage # s
+        if fuel_time > time:
+            self.fuel -= self.fuel_usage * time
+            return self.propulsion * time
+        else:
+            self.fuel = 0
+            return self.propulsion * fuel_time
+
     def timestep(self, ts = 1, propulsion_on = False):
-        pass
+        F_drag = self.get_drag()
+        F_g = self.planet.get_F_gravity(self.mass, altitude = self.alt)
+        if propulsion_on:
+            F_propulsion = self.propel(ts)
+        else:
+            F_propulsion = 0
+        F_total = F_propulsion - F_drag - F_g
+        a = F_total / self.mass # acceleration (m/s^2)
+        self.V += a * ts
+        self.alt += self.V * ts
+
+        return self.alt

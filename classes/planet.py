@@ -9,10 +9,12 @@ class Planet:
         self.radius = radius
         self.atmosphere = atmosphere.AtmosphereModel(planet = "Earth") #later numbers from elsewhere
 
-        def get_g(self, alt):
-            g = (con.G*self.mass)/(self.radius+alt)**2
-            return g
+    def get_g(self, alt):
+        g = (con.G*self.mass)/(self.radius+alt)**2
+        return g
 
-        def get_F_gravity(self, mass, distance):
-            F = con.G*((self.mass*mass)/distance**2)
-            return F
+    def get_F_gravity(self, mass, distance = None, altitude = None):
+        if not distance:
+            distance = self.radius + altitude
+        F = con.G*((self.mass*mass)/distance**2)
+        return F
