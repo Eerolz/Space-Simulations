@@ -46,7 +46,7 @@ class Vehicle:
             return self.propulsion
         elif 0 < fuel_time < time:
             self.fuel = 0
-            return self.propulsion
+            return self.propulsion * (fuel_time/time)
         elif fuel_time == 0:
             self.propulsion = 0
             return self.propulsion
@@ -66,4 +66,4 @@ class Vehicle:
         self.V += a * ts
         self.alt += self.V * ts
 
-        return self.alt
+        return a, F_total
