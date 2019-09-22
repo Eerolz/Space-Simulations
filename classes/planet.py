@@ -4,7 +4,7 @@ from . import atmosphere
 
 class Planet:
     """Planet class for space simulations"""
-    def __init__(self, mass = 5972000000000000000000000, radius = 6371000):
+    def __init__(self, mass = 5972.e21, radius = 6371.e3):
         self.mass = mass
         self.radius = radius
         self.atmosphere = atmosphere.AtmosphereModel(planet = "Earth") #later numbers from elsewhere
@@ -13,8 +13,10 @@ class Planet:
         g = (con.G*self.mass)/(self.radius+alt)**2
         return g
 
-    def get_F_gravity(self, mass, distance = None, altitude = None):
+    def get_F_gravity(self, mass, distance = None, alt = None):
         if not distance:
-            distance = self.radius + altitude
-        F = con.G*((self.mass*mass)/distance**2)
+            g = self.get_g(alt)
+            F = mass * g
+        else:
+            F = con.G*((self.mass*mass)/distance**2)
         return F

@@ -7,10 +7,15 @@ launchaltitude = 100 # m
 weight = 5000 # kg
 rocket = vehicle.Vehicle(planet = earth, size=size, mass = weight, V = launchspeed, alt = launchaltitude)
 
-for i in range(100):
-    alt = rocket.timestep(0.01)
+tstep = 0.0001
+time = 10
+
+nsteps = int(time / tstep)
+
+for i in range(nsteps):
+    alt = rocket.timestep(tstep)
     print(alt)
     if alt < 0:
         break
 
-print(rocket.V)
+print('\n' + str(rocket.V))

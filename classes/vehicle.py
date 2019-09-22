@@ -13,7 +13,7 @@ class Vehicle:
         self.propulsion = propulsion # N
         self.fuel = fuel # kg
         self.fuel_usage = fuel_usage # kg/s
-        self.alt = 0 # altitude (m)
+        self.alt = alt # altitude (m)
         self.V = V # speed (m/s), currently verticality assumed
 
     def get_drag(self, alt = None, V = None):
@@ -39,24 +39,30 @@ class Vehicle:
 
         return drag
 
-    def propel(time):
+    def propel(self, time):
         fuel_time = self.fuel/self.fuel_usage # s
         if fuel_time > time:
             self.fuel -= self.fuel_usage * time
-            return self.propulsion * time
-        else:
+            return self.propulsion
+        elif 0 < fuel_time < time:
             self.fuel = 0
-            return self.propulsion * fuel_time
+            return self.propulsion
+        elif fuel_time == 0:
+            self.propulsion = 0
+            return self.propulsion
 
     def timestep(self, ts = 1, propulsion_on = False):
         F_drag = self.get_drag()
-        F_g = self.planet.get_F_gravity(self.mass, altitude = self.alt)
+        F_g = self.planet.get_F_gravity(self.mass, alt = self.alt)
         if propulsion_on:
             F_propulsion = self.propel(ts)
         else:
             F_propulsion = 0
-        F_total = F_propulsion - F_drag - F_g
-        a = F_total / self.mass # acceleration (m/s^2)
+        if self.V >= 0:
+            F_total = F_propulsion - F_drag - F_g
+        else:
+            F_total = F_propulsion + F_drag - F_g
+        a = F_total / (self.fuel + self.mass) # acceleration (m/s^2)
         self.V += a * ts
         self.alt += self.V * ts
 
