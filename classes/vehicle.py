@@ -1,7 +1,7 @@
 from scipy import constants as con
 
 class Vehicle:
-    def __init__(self, size, mass, planet = None, shape = "cylinder", alt = 0, V = 0, propulsion = None, fuel = 0, fuel_usage = None):
+    def __init__(self, size, mass, planet = None, shape = 'cylinder', alt = 0, V = 0, propulsion = None, fuel = 0, fuel_usage = None):
         # dimensions (m), (lenght, width, depth), if no width, width=length; if no depth, depth=width
         if len(size) == 1:
             self.size = (size[0], size[0], size[0])
@@ -24,14 +24,16 @@ class Vehicle:
         if not self.planet or V == 0:
             return 0
 
-        l = self.size[0] # lenght
-        d = self.size[1] # diameter
+        if self.shape == 'cylinder':
+            l = self.size[0] # lenght
+            d = self.size[1] # diameter
+            A_cross = con.pi * (d / 2)**2    # assuming circular cross-section
+            A_wet = (con.pi * d * l) + A_cross    # assuming cylinder-like shape
+        else:
+            raise Exception('Shape "{}" is not yet implemented.'.format(self.shape))
 
         Be = self.planet.atmosphere.get_Be(alt, V, l)
         Re = self.planet.atmosphere.get_Re(alt, V, l)
-
-        A_cross = con.pi * (d / 2)**2    # assuming circular cross-section
-        A_wet = (con.pi * d * l) + A_cross    # assuming cylinder-like shape
         C_d = (A_wet / A_cross) * (Be / Re**2)    # Drag coefficient
 
         rho = self.planet.atmosphere.get_rho(alt)
