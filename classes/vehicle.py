@@ -2,14 +2,15 @@ from scipy import constants as con
 
 class Vehicle:
     def __init__(self, size, mass, planet = None, shape = 'cylinder', alt = 0, V = 0, propulsion = None, fuel = 0, fuel_usage = None):
-        # dimensions (m), (lenght, width, depth), if no width, width=length; if no depth, depth=width
-        if len(size) == 1:
-            self.size = (size[0], size[0], size[0])
-        elif len(size) == 2:
-            self.size = (size[0], size[1], size[1])
+        # dimension arguments vary with shape
+        if len(size) != 2 and shape == 'cylinder':
+            raise Exception('Shape "{}" takes 2 parameters for size. (lenght, diameter)')
+        elif len(size) != 1 and shape == 'ball':
+            raise Exception('Shape "ball" takes 1 parameter for size. (diameter)')
+        self.size = size
+        self.shape = shape # shape of the Vehicle
         self.mass = mass # dry mass (kg)
         self.planet = planet # the planet Vehicle is on
-        self.shape = shape # shape of the Vehicle
         self.propulsion = propulsion # N
         self.fuel = fuel # kg
         self.fuel_usage = fuel_usage # kg/s
@@ -21,7 +22,7 @@ class Vehicle:
             alt = self.alt
         if not V:
             V = self.V
-        if not self.planet or V == 0:
+        if not self.planet or V == 0 or alt >= 100000:
             return 0
 
         if self.shape == 'cylinder':
@@ -29,8 +30,13 @@ class Vehicle:
             d = self.size[1] # diameter
             A_cross = con.pi * (d / 2)**2    # assuming circular cross-section
             A_wet = (con.pi * d * l) + A_cross    # assuming cylinder-like shape
+        elif self.shape == 'ball':
+            r = self.size[0] / 2
+            l = con.pi * r # half of the circumference
+            A_cross = con.pi * r**2
+            A_wet = 4 * con.pi * r**2
         else:
-            raise Exception('Shape "{}" is not yet implemented.'.format(self.shape))
+            raise Exception('Shape "{}" is not yet implemented for drag.'.format(self.shape))
 
         Be = self.planet.atmosphere.get_Be(alt, V, l)
         Re = self.planet.atmosphere.get_Re(alt, V, l)
