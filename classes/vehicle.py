@@ -59,11 +59,15 @@ class Vehicle:
             self.propulsion = 0
             return self.propulsion
 
-    def timestep(self, ts = 1, propulsion_on = False):
+    def timestep(self, ts = 1, propulsion_direction = 0):
+        """Do a timestep:
+        ts is the lenght of the timestep
+        propulsion direction: 0=no propulsion, -1=accelerate down, 1=accelerate up"""
+
         F_drag = self.get_drag()
         F_g = self.planet.get_F_gravity(self.mass, alt = self.alt)
-        if propulsion_on:
-            F_propulsion = self.propel(ts)
+        if propulsion_direction:
+            F_propulsion = self.propel(ts)*propulsion_direction
         else:
             F_propulsion = 0
         if self.V >= 0:
